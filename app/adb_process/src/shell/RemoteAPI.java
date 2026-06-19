@@ -84,7 +84,10 @@ public class RemoteAPI {
                 } catch (Exception ignored) {
                 }
             }
-            responseEnd(socket, "" + new ScreenColor().autoBarColor());
+            ScreenColor.autoBarColor();
+            responseEnd(socket, "");
+        } else if (request.startsWith("/get-bar-color")) {
+            responseEnd(socket, "" + ScreenColor.getBarColor());
         } else if (request.startsWith("/nav-light-color")) {
             // dumpsys window visible | grep LIGHT_
             // LIGHT_STATUS_BAR

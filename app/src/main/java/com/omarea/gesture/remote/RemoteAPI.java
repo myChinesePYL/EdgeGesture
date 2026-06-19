@@ -23,17 +23,13 @@ public class RemoteAPI {
     public static String[] getRecents() {
         return loadContent((Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) ? "recent-9" : "recent-10").split("\n");
     }
+    
+    public static void updateBarAutoColor() {
+        loadContent("bar-color?" + GlobalState.displayWidth + "x" + GlobalState.displayHeight);
+    }
 
-    public static int getBarAutoColor(boolean delayScreenCap) {
-        // TODO:改为可配置而非自动
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            String isLightColor = loadContent("nav-light-color");
-            if (isLightColor != null && isLightColor.equals("true")) {
-                return 0xFF000000;
-            }
-        }
-
-        String colorStr = loadContent("bar-color?" + GlobalState.displayWidth + "x" + GlobalState.displayHeight);
+    public static int getBarAutoColor() {
+        String colorStr = loadContent("get-bar-color");
 
         if (!(colorStr == null || colorStr.isEmpty())) {
             try {

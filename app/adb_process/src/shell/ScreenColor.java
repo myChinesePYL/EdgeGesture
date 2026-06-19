@@ -4,9 +4,24 @@ import java.io.BufferedInputStream;
 import java.nio.ByteBuffer;
 
 public class ScreenColor {
-    private int computeBarColor(long[] colors) {
+    private static boolean lastIsLight = false;
+    private static long lastTime = System.currentTimeMillis();
+    
+    public static int getBarColor() {
+        if (lastIsLight) {
+            double a = Math.min(1.0, (System.currentTimeMillis() - lastTime) / 250.0);
+            int c = (int)Math.floor((1.0-a)*255.0);
+            return (0xFF << 24) | ((c & 0xFF) << 16) | ((c & 0xFF) << 8) | (c & 0xFF);
+        } else {
+            double a = Math.min(1.0, (System.currentTimeMillis() - lastTime) / 250.0);
+            int c = (int)Math.floor(a*255.0);
+            return (0xFF << 24) | ((c & 0xFF) << 16) | ((c & 0xFF) << 8) | (c & 0xFF);
+        }
+    }
+
+    private static void computeBarColor(long[] colors) {
         if (colors.length == 0) {
-            return Integer.MIN_VALUE;
+            return;
         }
 
         int lightPixelCount = 0;
@@ -24,14 +39,16 @@ public class ScreenColor {
 
         if (lightPixelCount > darkPixelCount) {
             // System.out.println("Gesture ADB Process: iOS White Bar Color Set To {Color.Black}");
-            return 0xFF000000;
+            if (!lastIsLight) lastTime = System.currentTimeMillis();
+            lastIsLight = true;
         } else {
             // System.out.println("Gesture ADB Process: iOS White Bar Color Set To {Color.White}");
-            return 0xFFFFFFFF;
+            if (lastIsLight) lastTime = System.currentTimeMillis();
+            lastIsLight = false;
         }
     }
 
-    void printRGBA(int color) {
+    static void printRGBA(int color) {
         int r = color >>> 24;
         int g = (color & 0xff0000) >> 16;
         int b = (color & 0xff00) >> 8;
@@ -39,7 +56,7 @@ public class ScreenColor {
         // System.out.println(r + ", " + g + ", " + b + ", " + a);
     }
 
-    private boolean pixelIsLightColor(long color) {
+    private static boolean pixelIsLightColor(long color) {
         long r = color >>> 24;
         long g = (color & 0xff0000) >> 16;
         long b = (color & 0xff00) >> 8;
@@ -51,7 +68,7 @@ public class ScreenColor {
         return r > 128 && g > 128 && b > 128;
     }
 
-    public int autoBarColor() {
+    public static void autoBarColor() {
         try {
             Process exec = Runtime.getRuntime().exec("screencap");
 
@@ -68,11 +85,10 @@ public class ScreenColor {
             }
 
             // 更新颜色
-            return computeBarColor(byteBuffer.array());
+            computeBarColor(byteBuffer.array());
         } catch (Exception e) {
             // System.out.println("Gesture ADB BarColor Error: " + e.getMessage());
         }
-        return Integer.MIN_VALUE;
     }
 
     // 像素采集
@@ -186,7 +202,7 @@ public class ScreenColor {
         }
     }
 
-    class PixelGatherThread extends Thread {
+    static class PixelGatherThread extends Thread {
         private PixelGather byteBuffer;
         private BufferedInputStream bufferedInputStream;
 
