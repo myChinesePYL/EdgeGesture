@@ -12,6 +12,8 @@ import android.content.res.Configuration;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.LruCache;
 import android.view.WindowManager;
 import android.view.accessibility.AccessibilityEvent;
@@ -26,6 +28,8 @@ import com.omarea.gesture.ui.SideGestureBar;
 import com.omarea.gesture.ui.QuickPanel;
 import com.omarea.gesture.util.GlobalState;
 import com.omarea.gesture.util.Recents;
+import com.omarea.gesture.SpfConfig;
+import com.omarea.gesture.WhiteBarColor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,6 +46,15 @@ public class AccessibilityServiceGesture extends AccessibilityService {
     private BroadcastReceiver screenStateReceiver;
     private SharedPreferences appSwitchBlackList;
     private BatteryReceiver batteryReceiver;
+    private Handler handler = new Handler(Looper.getMainLooper());
+    private Runnable periodicTask = new Runnable() {
+        @Override
+        public void run() {
+            WhiteBarColor.updateBarColorSingle();
+
+            handler.postDelayed(this, 250);
+        }
+    };
 
     private boolean removeGestureView() {
         if (floatVitualTouchBar != null) {
@@ -474,6 +487,12 @@ public class AccessibilityServiceGesture extends AccessibilityService {
         }
         setServiceInfo(accessibilityServiceInfo);
     }
+    
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        handler.post(periodicTask);
+    }
 
     @Override
     public void onDestroy() {
@@ -495,6 +514,7 @@ public class AccessibilityServiceGesture extends AccessibilityService {
             unregisterReceiver(batteryReceiver);
             batteryReceiver = null;
         }
+        handler.removeCallbacks(periodicTask);
         // stopForeground(true);
         super.onDestroy();
     }

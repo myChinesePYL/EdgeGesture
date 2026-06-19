@@ -89,10 +89,10 @@ public class RemoteAPI {
             // dumpsys window visible | grep LIGHT_
             // LIGHT_STATUS_BAR
             // LIGHT_NAVIGATION_BAR
-            String result = KeepShellPublic.doCmdSync("dumpsys window visible | grep LIGHT_");
-            boolean isLight = result.contains("LIGHT_STATUS_BAR") || result.contains("LIGHT_NAVIGATION_BAR");
+            // String result = KeepShellPublic.doCmdSync("dumpsys window visible | grep LIGHT_");
+            // boolean isLight = result.contains("LIGHT_STATUS_BAR") || result.contains("LIGHT_NAVIGATION_BAR");
             // System.out.println(result + ">" + isLight);
-            responseEnd(socket, (isLight ? "true" : "false"));
+            responseEnd(socket, (false ? "true" : "false"));
         } else if (request.startsWith("/recent-9")) {
             // responseEnd(socket, subPackageName(KeepShellPublic.doCmdSync("dumpsys activity r | grep realActivity")));
             responseEnd(socket, filterPackages(KeepShellPublic.doCmdSync("dumpsys activity r")));

@@ -13,27 +13,12 @@ public class ScreenColor {
         int darkPixelCount = 0;
 
         int center = colors.length / 2;
-        // 前一半样本（状态栏）
-        for (int i = 0; i < center; i++) {
+
+        for (int i = center; i < colors.length; i++) {
             if (pixelIsLightColor(colors[i])) {
                 lightPixelCount++;
             } else {
                 darkPixelCount++;
-            }
-        }
-
-        // 如果状态栏的样本判断完发现，亮色的点少于深色的点（说明状态栏主要是黑色）
-        // 如果状态栏是黑色，则继续后面的判断（因为状态栏是白色的界面基本可以断定是浅色APP，底部应该也是白色）
-        if (lightPixelCount < darkPixelCount) {
-            lightPixelCount = 0;
-            darkPixelCount = 0;
-            // 后一半样本（导航栏）
-            for (int i = center; i < colors.length; i++) {
-                if (pixelIsLightColor(colors[i])) {
-                    lightPixelCount++;
-                } else {
-                    darkPixelCount++;
-                }
             }
         }
 
@@ -63,7 +48,7 @@ public class ScreenColor {
         // System.out.printf("RGBA(%d,%d,%d,%d)\n", r, g, b, a);
         // alpha通道基本上都是固定的255
         // return r > 180 && g > 180 && b > 180 && a > 180;
-        return r > 180 && g > 180 && b > 180;
+        return r > 128 && g > 128 && b > 128;
     }
 
     public int autoBarColor() {

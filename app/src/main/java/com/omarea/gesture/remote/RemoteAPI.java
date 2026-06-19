@@ -32,13 +32,6 @@ public class RemoteAPI {
                 return 0xFF000000;
             }
         }
-        if (delayScreenCap) {
-            // 延缓截图，以免在动画播放期间过早的截图导致颜色取到的还是黑色背景
-            try {
-                Thread.sleep(300);
-            } catch (Exception ignored) {
-            }
-        }
 
         String colorStr = loadContent("bar-color?" + GlobalState.displayWidth + "x" + GlobalState.displayHeight);
 
