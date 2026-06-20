@@ -66,7 +66,8 @@ public class ScreenColor {
         // System.out.printf("RGBA(%d,%d,%d,%d)\n", r, g, b, a);
         // alpha通道基本上都是固定的255
         // return r > 180 && g > 180 && b > 180 && a > 180;
-        return r > 128 && g > 128 && b > 128;
+        long luminance = (299 * r + 587 * g + 114 * b) / 1000;
+        return luminance > 128;
     }
 
     public static boolean autoBarColor() {
