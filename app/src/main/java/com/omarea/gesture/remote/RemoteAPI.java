@@ -1,8 +1,10 @@
 package com.omarea.gesture.remote;
 
 import android.os.Build;
+import android.widget.Toast;
 
 import com.omarea.gesture.util.GlobalState;
+import com.omarea.gesture.Gesture;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -24,8 +26,9 @@ public class RemoteAPI {
         return loadContent((Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) ? "recent-9" : "recent-10").split("\n");
     }
     
-    public static void updateBarAutoColor() {
-        loadContent("bar-color?" + GlobalState.displayWidth + "x" + GlobalState.displayHeight);
+    public static boolean updateBarAutoColor() {
+        String result = loadContent("bar-color?" + GlobalState.displayWidth + "x" + GlobalState.displayHeight);
+        return result != null && result.equals("true");
     }
 
     public static int getBarAutoColor() {

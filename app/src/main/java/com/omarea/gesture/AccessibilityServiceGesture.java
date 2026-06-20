@@ -47,13 +47,24 @@ public class AccessibilityServiceGesture extends AccessibilityService {
     private BroadcastReceiver screenStateReceiver;
     private SharedPreferences appSwitchBlackList;
     private BatteryReceiver batteryReceiver;
+
+    private static boolean lastIsLight = false;
+    private static long lastTime = System.currentTimeMillis();
+    private static final double allTime = 500.0;
     private int lastCol = 0x0;
     private boolean rending = false;
     private boolean running = false;
     private Runnable f = new Runnable() {
                     @Override
                     public void run() {
-                        RemoteAPI.updateBarAutoColor();
+                        if (RemoteAPI.updateBarAutoColor()) {
+                            if (!lastIsLight) lastTime = System.currentTimeMillis();
+                            lastIsLight = true;
+                        } else {
+                            if (lastIsLight) lastTime = System.currentTimeMillis();
+                            lastIsLight = false;
+                        }
+
                         running = false;
                     }
                 };
@@ -66,13 +77,13 @@ public class AccessibilityServiceGesture extends AccessibilityService {
                 new Thread(f).start();
             }
 
-            handler.postDelayed(this, 250);
+            handler.postDelayed(this, rending ? 50 : (int)allTime);
         }
     };
     private Choreographer.FrameCallback frameCallback = new Choreographer.FrameCallback() {
         @Override
         public void doFrame(long frameTimeNanos) {
-            int color = RemoteAPI.getBarAutoColor();
+            int color = getBarColor();
             GlobalState.iosBarColor = color;
             if (GlobalState.updateBar != null) GlobalState.updateBar.run();
             
@@ -82,6 +93,18 @@ public class AccessibilityServiceGesture extends AccessibilityService {
             Choreographer.getInstance().postFrameCallback(this);
         }
     };
+    
+    public static int getBarColor() {
+        if (lastIsLight) {
+            double a = Math.min(1.0, (System.currentTimeMillis() - lastTime) / allTime);
+            int c = (int)Math.floor(70+(1.0-a)*165.0);
+            return (0xFF << 24) | ((c & 0xFF) << 16) | ((c & 0xFF) << 8) | (c & 0xFF);
+        } else {
+            double a = Math.min(1.0, (System.currentTimeMillis() - lastTime) / allTime);
+            int c = (int)Math.floor(70+a*165.0);
+            return (0xFF << 24) | ((c & 0xFF) << 16) | ((c & 0xFF) << 8) | (c & 0xFF);
+        }
+    }
 
     private boolean removeGestureView() {
         if (floatVitualTouchBar != null) {

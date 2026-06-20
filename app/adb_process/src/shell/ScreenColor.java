@@ -6,7 +6,7 @@ import java.nio.ByteBuffer;
 public class ScreenColor {
     private static boolean lastIsLight = false;
     private static long lastTime = System.currentTimeMillis();
-    private static final double allTime = 400.0;
+    private static final double allTime = 500.0;
     
     public static int getBarColor() {
         if (lastIsLight) {
@@ -69,7 +69,7 @@ public class ScreenColor {
         return r > 128 && g > 128 && b > 128;
     }
 
-    public static void autoBarColor() {
+    public static boolean autoBarColor() {
         try {
             Process exec = Runtime.getRuntime().exec("screencap");
 
@@ -90,6 +90,8 @@ public class ScreenColor {
         } catch (Exception e) {
             // System.out.println("Gesture ADB BarColor Error: " + e.getMessage());
         }
+        
+        return lastIsLight;
     }
 
     // 像素采集

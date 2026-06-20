@@ -84,8 +84,8 @@ public class RemoteAPI {
                 } catch (Exception ignored) {
                 }
             }
-            ScreenColor.autoBarColor();
-            responseEnd(socket, "");
+
+            responseEnd(socket, (ScreenColor.autoBarColor() ? "true" : "false"));
         } else if (request.startsWith("/get-bar-color")) {
             responseEnd(socket, "" + ScreenColor.getBarColor());
         } else if (request.startsWith("/nav-light-color")) {
