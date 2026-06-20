@@ -24,6 +24,7 @@ import android.view.inputmethod.InputMethodInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
+import com.omarea.gesture.Gesture;
 import com.omarea.gesture.remote.RemoteAPI;
 import com.omarea.gesture.ui.SideGestureBar;
 import com.omarea.gesture.ui.QuickPanel;
@@ -46,24 +47,37 @@ public class AccessibilityServiceGesture extends AccessibilityService {
     private BroadcastReceiver screenStateReceiver;
     private SharedPreferences appSwitchBlackList;
     private BatteryReceiver batteryReceiver;
-    private long lastTime = 0;
+    private int lastCol = 0x0;
+    private boolean rending = false;
+    private boolean running = false;
+    private Runnable f = new Runnable() {
+                    @Override
+                    public void run() {
+                        RemoteAPI.updateBarAutoColor();
+                        running = false;
+                    }
+                };
+    private Handler handler = Gesture.handler;
+    private Runnable periodicTask = new Runnable() {
+        @Override
+        public void run() {
+            if (!running && !rending) {
+                running = true;
+                new Thread(f).start();
+            }
+
+            handler.postDelayed(this, 250);
+        }
+    };
     private Choreographer.FrameCallback frameCallback = new Choreographer.FrameCallback() {
         @Override
         public void doFrame(long frameTimeNanos) {
-            long time = System.currentTimeMillis();
-            if (time - lastTime > 500) {
-                RemoteAPI.updateBarAutoColor();
-                lastTime = time;
-            }
-
             int color = RemoteAPI.getBarAutoColor();
-            if (color != Integer.MIN_VALUE) {
-                GlobalState.iosBarColor = color;
-
-                if (GlobalState.updateBar != null) {
-                    GlobalState.updateBar.run();
-                }
-            }
+            GlobalState.iosBarColor = color;
+            if (GlobalState.updateBar != null) GlobalState.updateBar.run();
+            
+            rending = lastCol != color;
+            lastCol = color;
 
             Choreographer.getInstance().postFrameCallback(this);
         }
@@ -313,6 +327,7 @@ public class AccessibilityServiceGesture extends AccessibilityService {
     public void onCreate() {
         super.onCreate();
         Choreographer.getInstance().postFrameCallback(frameCallback);
+        handler.post(periodicTask);
     }
 
     @Override
@@ -336,6 +351,7 @@ public class AccessibilityServiceGesture extends AccessibilityService {
             batteryReceiver = null;
         }
         Choreographer.getInstance().removeFrameCallback(frameCallback);
+        handler.removeCallbacks(periodicTask);
         // stopForeground(true);
         super.onDestroy();
     }

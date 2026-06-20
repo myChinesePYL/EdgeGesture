@@ -6,14 +6,15 @@ import java.nio.ByteBuffer;
 public class ScreenColor {
     private static boolean lastIsLight = false;
     private static long lastTime = System.currentTimeMillis();
+    private static final double allTime = 400.0;
     
     public static int getBarColor() {
         if (lastIsLight) {
-            double a = Math.min(1.0, (System.currentTimeMillis() - lastTime) / 250.0);
+            double a = Math.min(1.0, (System.currentTimeMillis() - lastTime) / allTime);
             int c = (int)Math.floor((1.0-a)*255.0);
             return (0xFF << 24) | ((c & 0xFF) << 16) | ((c & 0xFF) << 8) | (c & 0xFF);
         } else {
-            double a = Math.min(1.0, (System.currentTimeMillis() - lastTime) / 250.0);
+            double a = Math.min(1.0, (System.currentTimeMillis() - lastTime) / allTime);
             int c = (int)Math.floor(a*255.0);
             return (0xFF << 24) | ((c & 0xFF) << 16) | ((c & 0xFF) << 8) | (c & 0xFF);
         }
