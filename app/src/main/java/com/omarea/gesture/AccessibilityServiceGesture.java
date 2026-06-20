@@ -50,7 +50,7 @@ public class AccessibilityServiceGesture extends AccessibilityService {
 
     private static boolean lastIsLight = false;
     private static long lastTime = System.currentTimeMillis();
-    private static final double allTime = 500.0;
+    private static final double allTime = 1000.0;
     private int lastCol = 0x0;
     private boolean rending = false;
     private boolean running = false;
@@ -97,11 +97,11 @@ public class AccessibilityServiceGesture extends AccessibilityService {
     public static int getBarColor() {
         if (lastIsLight) {
             double a = Math.min(1.0, (System.currentTimeMillis() - lastTime) / allTime);
-            int c = (int)Math.floor(70+(1.0-a)*165.0);
+            int c = (int)Math.floor(70+(1.0-a)*185.0);
             return (0xFF << 24) | ((c & 0xFF) << 16) | ((c & 0xFF) << 8) | (c & 0xFF);
         } else {
             double a = Math.min(1.0, (System.currentTimeMillis() - lastTime) / allTime);
-            int c = (int)Math.floor(70+a*165.0);
+            int c = (int)Math.floor(70+a*185.0);
             return (0xFF << 24) | ((c & 0xFF) << 16) | ((c & 0xFF) << 8) | (c & 0xFF);
         }
     }
