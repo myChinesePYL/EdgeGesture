@@ -77,7 +77,7 @@ public class AccessibilityServiceGesture extends AccessibilityService {
                 new Thread(f).start();
             }
 
-            handler.postDelayed(this, rending ? 50 : (int)allTime);
+            handler.postDelayed(this, rending ? (int)(allTime/4.0) : (int)allTime);
         }
     };
     private Choreographer.FrameCallback frameCallback = new Choreographer.FrameCallback() {
