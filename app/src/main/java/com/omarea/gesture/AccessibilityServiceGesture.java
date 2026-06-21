@@ -77,7 +77,7 @@ public class AccessibilityServiceGesture extends AccessibilityService {
                 new Thread(f).start();
             }
 
-            handler.postDelayed(this, rending ? (int)(allTime/4.0) : (int)allTime);
+            if (!rending) handler.postDelayed(this, (int)allTime);
         }
     };
     private Choreographer.FrameCallback frameCallback = new Choreographer.FrameCallback() {
@@ -87,8 +87,11 @@ public class AccessibilityServiceGesture extends AccessibilityService {
             GlobalState.iosBarColor = color;
             if (GlobalState.updateBar != null) GlobalState.updateBar.run();
             
+            boolean lastRending = rending;
             rending = lastCol != color;
             lastCol = color;
+            
+            if (lastRending && !rending) handler.post(periodicTask);
 
             Choreographer.getInstance().postFrameCallback(this);
         }
