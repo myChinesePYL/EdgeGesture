@@ -100,11 +100,11 @@ public class AccessibilityServiceGesture extends AccessibilityService {
     public static int getBarColor() {
         if (lastIsLight) {
             double a = Math.min(1.0, (System.currentTimeMillis() - lastTime) / allTime);
-            int c = (int)Math.floor(70+(1.0-a)*185.0);
+            int c = (int)Math.floor((1.0-a)*255.0);
             return (0xFF << 24) | ((c & 0xFF) << 16) | ((c & 0xFF) << 8) | (c & 0xFF);
         } else {
             double a = Math.min(1.0, (System.currentTimeMillis() - lastTime) / allTime);
-            int c = (int)Math.floor(70+a*185.0);
+            int c = (int)Math.floor(a*255.0);
             return (0xFF << 24) | ((c & 0xFF) << 16) | ((c & 0xFF) << 8) | (c & 0xFF);
         }
     }
